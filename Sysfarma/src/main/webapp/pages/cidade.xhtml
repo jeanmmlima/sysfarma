@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Cidades</title>
+</h:head>
+<h:body>
+
+	<p:growl id="message" />
+
+	<h:form id="mainForm">
+		<p:panel header="Cidade - Listagem">
+			<p:dataTable id="table" emptyMessage="Nenhum registro encontrado"
+				paginator="true" value="#{cidadeBean.cidades}" var="cidade" rows="5">
+
+				<!-- Quero trocar propriedade footer da tabela -->
+				<f:facet name="footer">
+					<!-- PF('widgetVar de que vc quer chamar') PF - função do prime faces-->
+					<p:commandButton value="Novo" oncomplete="PF('diagCidades').show()"
+						actionListener="#{cidadeBean.novaCidade()}"
+						update=":formCadastro:painel :message"> 
+						<f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+					</p:commandButton>
+				</f:facet>
+
+				<p:column headerText="Nome" sortBy="#{cidade.nome}"
+					filterBy="#{cidade.nome}">
+					<h:outputText value="#{cidade.nome}" />
+				</p:column>
+
+				<p:column headerText="Estado">
+					<h:outputText value="#{cidade.estado.sigla}" /> 
+				</p:column>
+
+				<p:column headerText="Opções">
+					<p:commandButton icon="ui-icon-closethick"
+						actionListener="#{cidadeBean.excluir}"
+						update=":message :mainForm:table">
+						<p:confirm header="Confirmação" message="Deseja excluir o estado?"
+							icon="ui-icon-alert" />
+						<!--  leva atributo para o Mbean -->
+						<!--  value leva o nome do CURSOR (estado) -->
+						<!-- name é o nome de como o CURSOR é recuperado para o BEAN -->
+						<f:attribute name="cidadeSelecionada" value="#{cidade}" />
+					</p:commandButton>
+					<p:commandButton actionListener="#{cidadeBean.editar}"
+						icon="ui-icon-pencil"
+						update=":message :formCadastro:painel"
+						oncomplete="PF('diagCidades').show()">
+						<f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+						<f:attribute name="cidadeSelecionada" value="#{cidade}" />
+					</p:commandButton>
+				</p:column>
+
+			</p:dataTable>
+			
+			<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+				<p:commandButton value="Não" type="button"
+				styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+				<p:commandButton value="Sim" type="button"
+				styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+			</p:confirmDialog>
+		</p:panel>
+	</h:form>
+	<!-- modal impede de usar a tela principal enquanto dialog está ativo -->
+	<p:dialog header="Cadastro de Cidades" widgetVar="diagCidades"
+		draggable="false" resizable="false" modal="true">
+		<h:form id="formCadastro">
+			<!-- formatação em colunas utilizando panelGrid -->
+			<h:panelGrid id="painel" columns="2">
+				<p:outputLabel for="nome" value="Nome do Cidade: " />
+				<p:inputText id="nome" maxlength="50" size="30"
+					value="#{cidadeBean.cidade.nome}" required="true"
+					requiredMessage="O campo 'Nome' é obrigatório!"/>
+				<p:outputLabel for="estado" value="Estado: " />
+				<p:selectOneMenu id="estado" filter="true" value="#{cidadeBean.cidade.estado}"
+					converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="O campo 'Estado' é obrigatório">
+					<f:selectItem noSelectionOption="true"
+						itemLabel="Selecione um estado" />
+					<f:selectItems value="#{cidadeBean.estados}" var="estado"
+						itemLabel="#{estado.nome}/#{estado.sigla}" itemValue="#{estado}" />
+				</p:selectOneMenu>
+			</h:panelGrid>
+			<h:panelGrid columns="2">
+				<p:commandButton value="Salvar"
+					actionListener="#{cidadeBean.salvar()}"
+					update="formCadastro:painel :mainForm:table :message" />
+				<p:commandButton value="Cancelar"
+					oncomplete="PF('diagCidades').hide()" />
+			</h:panelGrid>
+		</h:form>
+
+	</p:dialog>
+	
+
+</h:body>
+</html>

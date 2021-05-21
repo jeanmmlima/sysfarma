@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Cliente</title>
+	<h:outputScript library="js" name="scripts.js"/>
+</h:head>
+<h:body>
+	<p:growl id="mensagem" />
+	<h:form id="formListagem">
+		<p:panel header="Cliente - Listagem">
+			<p:dataTable id="tabela" emptyMessage="Nenhum registro encontrado"
+				paginator="true" value="#{clienteBean.clientes}" var="cliente"
+				rows="5">
+
+				<!-- Quero trocar propriedade footer da tabela -->
+				<f:facet name="footer">
+					<!-- PF('widgetVar de que vc quer chamar') PF - função do prime faces-->
+					<p:commandButton value="Novo"
+						oncomplete="PF('diagClientes').show()"
+						actionListener="#{clienteBean.novo}"
+						update=":mensagem :formCadastro:painel">
+						<f:actionListener
+							type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+					</p:commandButton>
+				</f:facet>
+
+				<p:column headerText="Nome" sortBy="#{cliente.pessoa.nome}"
+					filterBy="#{cliente.pessoa.nome}">
+					<h:outputText value="#{cliente.pessoa.nome}" />
+				</p:column>
+
+				<p:column headerText="CPF">
+					<h:outputText value="#{cliente.pessoa.cpf}" />
+				</p:column>
+
+				<p:column headerText="Data de Cadastro">
+					<h:outputText value="#{cliente.dataCadastro}">
+						<f:convertDateTime locale="pt_BR" />
+					</h:outputText>
+				</p:column>
+
+				<p:column headerText="Liberado">
+					<p:selectBooleanCheckbox value="#{cliente.liberado}"
+						disabled="true" />
+				</p:column>
+
+				<p:column headerText="Opções">
+				</p:column>
+
+			</p:dataTable>
+		</p:panel>
+	</h:form>
+	<!-- modal impede de usar a tela principal enquanto dialog está ativo -->
+	<p:dialog header="Cadastro de Clientes" widgetVar="diagClientes"
+		draggable="false" resizable="false" modal="true">
+		<h:form id="formCadastro">
+			<!-- formatação em colunas utilizando panelGrid -->
+			<h:panelGrid id="painel" columns="2">
+				<p:outputLabel for="pessoa" value="Pessoa: " />
+				<p:selectOneMenu id="pessoa" filter="true" required="true"
+					requiredMessage="O campo 'Pessoa' é obrigatório"
+					converter="omnifaces.SelectItemsConverter"
+					value="#{clienteBean.cliente.pessoa}">
+					<f:selectItem noSelectionOption="true"
+						itemLabel="Selecione uma pessoa" />
+					<f:selectItems value="#{clienteBean.pessoas}" var="cliente"
+						itemValue="#{cliente}"
+						itemLabel="#{cliente.nome} - #{cliente.cpf}" />
+				</p:selectOneMenu>
+				<p:outputLabel for="dataCadastro" value="Data de Cadastro: " />
+				<p:calendar id="dataCadastro"
+					value="#{clienteBean.cliente.dataCadastro}" required="true"
+					requiredMessage="O campo 'data de cadastro' é obrigatório" 
+					locale="pt_BR"/>
+
+				<p:outputLabel for="Liberado" value="Ativo: " />
+				<p:selectBooleanCheckbox id="Liberado"
+					value="#{clienteBean.cliente.liberado}" required="true"
+					requiredMessage="O campo 'Liberado' é obrigatório" />
+
+			</h:panelGrid>
+			<h:panelGrid columns="2">
+				<p:commandButton value="Salvar"
+					update=":mensagem :formCadastro:painel :formListagem:tabela" 
+					actionListener="#{clienteBean.salvar}"/>
+				<p:commandButton value="Cancelar"
+					oncomplete="PF('diagClientes').hide()" />
+			</h:panelGrid>
+		</h:form>
+
+	</p:dialog>
+
+</h:body>
+</html>

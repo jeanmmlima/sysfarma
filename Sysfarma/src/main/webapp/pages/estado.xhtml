@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Estados</title>
+</h:head>
+<h:body>
+
+	<p:growl id="message" />
+
+	<h:form id="formEstados">
+		<p:panel header="Estados - Listagem">
+			<!-- Cursor para desenhar a tabela com os itens de estados. Cursor deve ser do tipo que se deseja contruir, no caso ESTADO -->
+			<!--  Cursor: var="estado" ==> estado itera os dados da tabela -->
+			<!-- rows = quantidade de itens por pagina -->
+			<p:dataTable id="tableEstados"
+				emptyMessage="Nenhum registro encontrado" paginator="true"
+				value="#{estadoBean.estados}" var="estado" rows="5">
+
+				<!-- Quero trocar propriedade footer da tabela -->
+				<f:facet name="footer">
+					<!-- PF('widgetVar de que vc quer chamar') PF - função do prime faces-->
+					<!-- :formCadastro:painel atualiza area do dialog quando abre! -->
+					<p:commandButton value="Novo"
+						actionListener="#{estadoBean.novoEstado()}"
+						oncomplete="PF('diagEstados').show()"
+						update=":formCadastro:painel" />
+				</f:facet>
+				<!-- nome do cursor . nome do campo (estado.nome) -->
+				<p:column headerText="Nome" sortBy="#{estado.nome}"
+					filterBy="#{estado.nome}">
+					<h:outputText value="#{estado.nome}" />
+				</p:column>
+
+				<p:column headerText="Sigla">
+					<h:outputText value="#{estado.sigla}" />
+				</p:column>
+
+				<p:column headerText="Opções">
+					<p:commandButton icon="ui-icon-closethick"
+						actionListener="#{estadoBean.excluir}"
+						update=":message :formEstados:tableEstados">
+						<p:confirm header="Confirmação" message="Deseja excluir o estado?"
+							icon="ui-icon-alert" />
+						<!--  leva atributo para o Mbean -->
+						<!--  value leva o nome do CURSOR (estado) -->
+						<!-- name é o nome de como o CURSOR é recuperado para o BEAN -->
+						<f:attribute name="estadoSelecionado" value="#{estado}" />
+					</p:commandButton>
+					<p:commandButton actionListener="#{estadoBean.editar}"
+						icon="ui-icon-pencil"
+						update=":message :formCadastro:painel"
+						oncomplete="PF('diagEstados').show()">
+						<f:attribute name="estadoSelecionado" value="#{estado}" />
+					</p:commandButton>
+				</p:column>
+
+			</p:dataTable>
+
+			<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+				<p:commandButton value="Não" type="button"
+					styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+				<p:commandButton value="Sim" type="button"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+			</p:confirmDialog>
+
+		</p:panel>
+	</h:form>
+	<!-- modal impede de usar a tela principal enquanto dialog está ativo -->
+	<p:dialog header="Cadastro de Estados" widgetVar="diagEstados"
+		draggable="false" resizable="false" modal="true">
+		<h:form id="formCadastro">
+			<!-- formatação em colunas utilizando panelGrid -->
+			<h:panelGrid id="painel" columns="2">
+				<p:outputLabel value="Nome do Estado: " />
+				<p:inputText maxlength="50" size="30"
+					value="#{estadoBean.estado.nome}" />
+				<p:outputLabel value="Sigla: " />
+				<p:inputText maxlength="2" size="10"
+					value="#{estadoBean.estado.sigla}" />
+			</h:panelGrid>
+			<h:panelGrid columns="3">
+				<!-- update atualiza através do AJAX o componente com ID = message -->
+				<p:commandButton value="Salvar"
+					actionListener="#{estadoBean.salvar()}"
+					update=":message :formCadastro:painel :formEstados:tableEstados" />
+				<p:commandButton value="Cancelar"
+					oncomplete="PF('diagEstados').hide()" />
+			</h:panelGrid>
+		</h:form>
+
+	</p:dialog>
+
+</h:body>
+</html>
