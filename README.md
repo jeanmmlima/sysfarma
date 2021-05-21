@@ -1,2 +1,2 @@
 # sysfarma
-Sistema Gerenciador de Farmácia Para Estudos
+Sistema Web Gerenciador de Farmácia Para Estudos
